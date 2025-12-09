@@ -50,11 +50,11 @@ def get_default_model_path() -> Optional[str]:
 class LLMConfig:
     """Configuration for local LLM"""
     model_path: str = ""
-    context_length: int = 8192
-    max_tokens: int = 4096
+    context_length: int = 4096  # Reduced for faster loading
+    max_tokens: int = 1024      # Reduced for faster generation
     temperature: float = 0.7
     top_p: float = 0.9
-    n_gpu_layers: int = -1  # -1 for all layers on GPU
+    n_gpu_layers: int = -1      # -1 = all layers on GPU
 
 
 class LlamaLocalLLM:
@@ -184,8 +184,8 @@ class LlamaLocalLLM:
         """
         system_prompt = self._get_script_system_prompt(language, style)
         user_prompt = self._get_script_user_prompt(topic, num_turns, language)
-        
-        response = self.generate(user_prompt, system_prompt=system_prompt)
+        # Use fewer tokens for podcast scripts (they don't need to be very long)
+        response = self.generate(user_prompt, system_prompt=system_prompt, max_tokens=800)
         
         # Parse JSON response
         import json

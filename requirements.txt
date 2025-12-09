@@ -23,8 +23,9 @@ huggingface_hub>=0.20.0
 
 # -----------------------------------------------------------------------------
 # LLM - Local Script Generation (Llama/Mistral)
-# For Windows with CUDA: pip install llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu121
+# Pre-built CUDA wheels available from: https://abetlen.github.io/llama-cpp-python/whl/cu121
 # -----------------------------------------------------------------------------
+--extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu121
 llama-cpp-python>=0.2.0
 
 # -----------------------------------------------------------------------------
