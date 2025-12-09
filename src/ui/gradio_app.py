@@ -87,22 +87,18 @@ def generate_script_from_content(
     language: str,
     style: str,
     num_turns: int,
-    model_path: str,
     progress=gr.Progress()
 ) -> Tuple[str, str]:
-    """Generate podcast script from content using LLM."""
+    """Generate podcast script from content using pre-installed LLM."""
     if not content.strip():
         return "", "⚠️ No content provided"
     
-    if not model_path or not Path(model_path).exists():
-        return "", "⚠️ LLM model not found. Please provide a valid GGUF model path."
-    
     try:
-        progress(0.2, desc="Loading LLM...")
+        progress(0.1, desc="Loading LLM...")
         from src.llm.llama_local import LlamaLocalLLM
         
         llm = LlamaLocalLLM()
-        llm.load(model_path)
+        llm.load()  # Auto-detects pre-installed model
         
         progress(0.5, desc="Generating script...")
         result = llm.generate_podcast_script(
@@ -355,13 +351,7 @@ def create_interface():
                                 label="Turns"
                             )
                         
-                        with gr.Row():
-                            llm_model_path = gr.Textbox(
-                                label="LLM Model Path (GGUF)",
-                                placeholder="path/to/mistral-7b.gguf",
-                                scale=3
-                            )
-                            generate_script_btn = gr.Button("🤖 Generate Script", variant="secondary")
+                        generate_script_btn = gr.Button("🤖 Generate Script", variant="secondary")
                         
                         # --- Editable Script ---
                         podcast_script = gr.Textbox(
@@ -504,7 +494,7 @@ Speaker2: Medical field में इसका बहुत फायदा ह�
                     fn=generate_script_from_content,
                     inputs=[
                         content_text, script_language, script_style, 
-                        num_turns, llm_model_path
+                        num_turns
                     ],
                     outputs=[podcast_script, script_status]
                 )

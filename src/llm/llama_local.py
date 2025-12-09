@@ -3,12 +3,47 @@ Local LLM Provider using llama-cpp-python
 
 Supports Llama and Mistral models for self-hosted script generation.
 No API keys required.
+
+Model should be pre-installed via: python setup_models.py
 """
 
 import os
 from typing import Optional, List, Dict, Generator
 from dataclasses import dataclass
 from pathlib import Path
+
+
+def find_gguf_models() -> List[str]:
+    """Find all GGUF model files in common locations."""
+    search_paths = [
+        Path.cwd(),
+        Path.cwd() / "models",
+        Path.home() / ".cache" / "huggingface" / "hub",
+        Path("/content/pod2") if Path("/content").exists() else None,  # Colab
+        Path("/content/pod2/models") if Path("/content").exists() else None,
+    ]
+    
+    models = []
+    for base_path in search_paths:
+        if base_path is None or not base_path.exists():
+            continue
+        for gguf_file in base_path.rglob("*.gguf"):
+            models.append(str(gguf_file))
+    
+    return models
+
+
+def get_default_model_path() -> Optional[str]:
+    """Get the path to a pre-installed GGUF model."""
+    models = find_gguf_models()
+    if models:
+        # Prefer mistral or llama models
+        for m in models:
+            if "mistral" in m.lower() or "llama" in m.lower():
+                return m
+        return models[0]
+    
+    return None
 
 
 @dataclass
@@ -32,7 +67,7 @@ class LlamaLocalLLM:
     
     Usage:
         llm = LlamaLocalLLM()
-        llm.load("path/to/model.gguf")
+        llm.load()  # Auto-detects pre-installed model
         response = llm.generate("Write a podcast script about AI")
     """
     
@@ -45,14 +80,22 @@ class LlamaLocalLLM:
         Load a GGUF model.
         
         Args:
-            model_path: Path to the .gguf model file
+            model_path: Path to the .gguf model file (auto-detects if not provided)
         """
         if self.llm is not None:
             return  # Already loaded
-            
+        
+        # Try to find model
         path = model_path or self.config.model_path
+        
         if not path:
-            raise ValueError("No model path provided. Please specify a GGUF model path.")
+            # Auto-detect pre-installed model
+            path = get_default_model_path()
+        
+        if not path:
+            raise FileNotFoundError(
+                "No LLM model found. Please run: python setup_models.py"
+            )
             
         if not Path(path).exists():
             raise FileNotFoundError(f"Model not found: {path}")

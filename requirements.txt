@@ -4,11 +4,11 @@
 # 
 # Model: https://huggingface.co/ai4bharat/indic-parler-tts
 # 
-# INSTALLATION:
-#   pip install -r requirements.txt
+# INSTALLATION (2 steps):
+#   Step 1: pip install -r requirements.txt
+#   Step 2: python setup_models.py
 #
-# FOR VOICE CLONING (requires Python 3.9-3.11):
-#   pip install TTS>=0.22.0
+# This downloads all libraries AND models (~7GB total).
 #
 # =============================================================================
 
