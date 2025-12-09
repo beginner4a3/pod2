@@ -55,8 +55,8 @@ class XTTSCloner:
         """Load the XTTS v2 model."""
         if not self.is_available():
             raise ImportError(
-                "TTS library is required for voice cloning. "
-                "Install with: pip install TTS>=0.22.0"
+                "coqui-tts library is required for voice cloning. "
+                "Install with: pip install coqui-tts>=0.25.0"
             )
             
         if self.model is not None:
@@ -157,4 +157,4 @@ if __name__ == "__main__":
         print("  cloner = XTTSCloner()")
         print("  audio = cloner.generate('Hello', reference_audio='voice.wav')")
     else:
-        print("Install TTS library for voice cloning: pip install TTS>=0.22.0")
+        print("Install coqui-tts for voice cloning: pip install coqui-tts>=0.25.0")

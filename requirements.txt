@@ -7,9 +7,8 @@
 # INSTALLATION:
 #   pip install -r requirements.txt
 #
-# WINDOWS WITH CUDA (for better GPU support):
-#   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-#   pip install -r requirements.txt
+# FOR VOICE CLONING (requires Python 3.9-3.11):
+#   pip install TTS>=0.22.0
 #
 # =============================================================================
 
@@ -21,11 +20,6 @@ torch>=2.0.0
 torchaudio>=2.0.0
 transformers>=4.40.0
 huggingface_hub>=0.20.0
-
-# -----------------------------------------------------------------------------
-# Voice Cloning - XTTS v2
-# -----------------------------------------------------------------------------
-TTS>=0.22.0
 
 # -----------------------------------------------------------------------------
 # LLM - Local Script Generation (Llama/Mistral)
@@ -68,3 +62,8 @@ python-multipart>=0.0.6
 python-dotenv>=1.0.0
 pyyaml>=6.0.0
 httpx>=0.24.0
+
+# -----------------------------------------------------------------------------
+# Voice Cloning - XTTS v2 (coqui-tts - Python 3.10-3.14 compatible)
+# -----------------------------------------------------------------------------
+coqui-tts>=0.25.0
