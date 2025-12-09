@@ -1,0 +1,106 @@
+# Unified Podcast Generator Configuration
+
+# =============================================================================
+# TTS Configuration (Indic-ParlerTTS)
+# =============================================================================
+tts:
+  # Model from HuggingFace (auto-downloaded)
+  model_id: "ai4bharat/indic-parler-tts"
+  
+  # Default speakers (per language)
+  default_speakers:
+    hindi:
+      speaker1: "Rohit"
+      speaker2: "Divya"
+    telugu:
+      speaker1: "Prakash"
+      speaker2: "Lalitha"
+    tamil:
+      speaker1: "Jaya"
+      speaker2: "Kavitha"
+    malayalam:
+      speaker1: "Harish"
+      speaker2: "Anjali"
+    kannada:
+      speaker1: "Suresh"
+      speaker2: "Anu"
+    bengali:
+      speaker1: "Arjun"
+      speaker2: "Aditi"
+    marathi:
+      speaker1: "Sanjay"
+      speaker2: "Sunita"
+    gujarati:
+      speaker1: "Yash"
+      speaker2: "Neha"
+    english:
+      speaker1: "Thoma"
+      speaker2: "Mary"
+  
+  # Default voice description template
+  description_template: "{speaker}'s voice is {emotion} with {pace} pace. The recording is of very high quality, with the speaker's voice sounding clear and very close up."
+  
+  # Speech settings
+  default_pace: "moderate"
+  default_emotion: "conversational"
+
+# =============================================================================
+# LLM Configuration
+# =============================================================================
+llm:
+  # Primary: Self-hosted Llama/Mistral (no API key needed)
+  provider: "llama-local"
+  
+  # Local model settings
+  local:
+    model_path: ""  # Path to GGUF model file (download separately)
+    model_repo: "TheBloke/Mistral-7B-Instruct-v0.2-GGUF"
+    model_file: "mistral-7b-instruct-v0.2.Q4_K_M.gguf"
+    context_length: 8192
+    max_tokens: 4096
+    temperature: 0.7
+  
+  # Alternative API providers (optional - requires API keys)
+  api_providers:
+    openai:
+      enabled: false
+      model: "gpt-4"
+    gemini:
+      enabled: false
+      model: "gemini-pro"
+
+# =============================================================================
+# API Keys (Optional - for API-based providers)
+# =============================================================================
+api_keys:
+  openai: ""      # Set via OPENAI_API_KEY env var
+  gemini: ""      # Set via GEMINI_API_KEY env var
+  huggingface: "" # Set via HF_TOKEN env var
+
+# =============================================================================
+# Podcast Generation Settings
+# =============================================================================
+podcast:
+  # Script generation
+  min_turns: 10
+  max_turns: 20
+  default_style: "conversational"  # conversational, interview, narrative
+  
+  # Audio settings
+  sample_rate: 24000
+  output_format: "mp3"  # mp3, wav
+  
+  # Audio effects
+  add_intro_music: true
+  add_background_noise: true
+  noise_level: 0.002
+  crossfade_ms: 100
+
+# =============================================================================
+# UI Settings
+# =============================================================================
+ui:
+  gradio:
+    title: "🎙️ Unified Podcast Generator"
+    theme: "soft"
+    share: false
