@@ -30,12 +30,13 @@ llama-cpp-python>=0.2.0
 
 # -----------------------------------------------------------------------------
 # Audio Processing
+# Pinned versions for binary compatibility
 # -----------------------------------------------------------------------------
-numpy==1.26.4  # Pinned to avoid binary incompatibility with parler-tts
+numpy==1.26.4
+scipy==1.12.0
 soundfile>=0.12.0
 librosa>=0.10.0
 pydub>=0.25.0
-scipy>=1.10.0
 
 # -----------------------------------------------------------------------------
 # Document Parsing (PDF, DOCX, TXT)

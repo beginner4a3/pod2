@@ -145,7 +145,9 @@ def is_voice_cloning_available() -> bool:
     try:
         from TTS.api import TTS
         return True
-    except ImportError:
+    except (ImportError, ValueError, Exception):
+        # ImportError: TTS not installed
+        # ValueError: numpy binary incompatibility on some Python versions
         return False
 
 
