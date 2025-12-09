@@ -1,50 +1,70 @@
 # =============================================================================
-# INDIC-PARLER-TTS - Unified Podcast Generator
+# UNIFIED PODCAST GENERATOR - Requirements
 # =============================================================================
 # 
 # Model: https://huggingface.co/ai4bharat/indic-parler-tts
 # 
-# WINDOWS INSTALLATION:
-# 1. Get your HuggingFace token from: https://huggingface.co/settings/tokens
-# 2. Set token in PowerShell:  $env:HF_TOKEN = "your_token_here"
-#    Or Command Prompt:        set HF_TOKEN=your_token_here
-# 3. Install dependencies:     pip install -r requirements.txt
+# INSTALLATION:
+#   pip install -r requirements.txt
+#
+# WINDOWS WITH CUDA (for better GPU support):
+#   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+#   pip install -r requirements.txt
 #
 # =============================================================================
 
-# Parler-TTS library (required to run Indic-ParlerTTS model)
+# -----------------------------------------------------------------------------
+# Core TTS - Indic ParlerTTS
+# -----------------------------------------------------------------------------
 parler-tts
-
-# PyTorch (CUDA recommended for GPU acceleration)
-# For Windows with CUDA: pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 torch>=2.0.0
 torchaudio>=2.0.0
-
-# Transformers and HuggingFace Hub (for model download with token)
 transformers>=4.40.0
 huggingface_hub>=0.20.0
 
-# Audio processing (Windows compatible)
+# -----------------------------------------------------------------------------
+# Voice Cloning - XTTS v2
+# -----------------------------------------------------------------------------
+TTS>=0.22.0
+
+# -----------------------------------------------------------------------------
+# LLM - Local Script Generation (Llama/Mistral)
+# For Windows with CUDA: pip install llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu121
+# -----------------------------------------------------------------------------
+llama-cpp-python>=0.2.0
+
+# -----------------------------------------------------------------------------
+# Audio Processing
+# -----------------------------------------------------------------------------
 soundfile>=0.12.0
 librosa>=0.10.0
 numpy>=1.24.0
 pydub>=0.25.0
 scipy>=1.10.0
 
-# LLM - Local (Llama/Mistral)
-# For Windows with CUDA: pip install llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu121
-# For Windows CPU only: pip install llama-cpp-python
-llama-cpp-python>=0.2.0
+# -----------------------------------------------------------------------------
+# Document Parsing (PDF, DOCX, TXT)
+# -----------------------------------------------------------------------------
+PyPDF2>=3.0.0
+python-docx>=0.8.0
+beautifulsoup4>=4.12.0
+requests>=2.31.0
 
-# UI
+# -----------------------------------------------------------------------------
+# UI - Gradio
+# -----------------------------------------------------------------------------
 gradio>=5.0.0
 
+# -----------------------------------------------------------------------------
+# API - FastAPI
+# -----------------------------------------------------------------------------
+fastapi>=0.100.0
+uvicorn>=0.23.0
+python-multipart>=0.0.6
+
+# -----------------------------------------------------------------------------
 # Utilities
+# -----------------------------------------------------------------------------
 python-dotenv>=1.0.0
 pyyaml>=6.0.0
 httpx>=0.24.0
-
-# Document processing (optional)
-PyPDF2>=3.0.0
-beautifulsoup4>=4.12.0
-requests>=2.31.0
