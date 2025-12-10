@@ -240,28 +240,39 @@ class LlamaLocalLLM:
         
         config = lang_config.get(language.lower(), lang_config["hindi"])
         
-        return f"""You are a podcast script writer. Write in {config['mix']} style.
+        return f"""You are a podcast script writer optimized for Indic Parler-TTS.
 
 OUTPUT FORMAT:
 Speaker1: [dialogue]
 Speaker2: [dialogue]
 
-STRICT RULES:
-1. Use "Speaker1:" and "Speaker2:" prefixes ONLY
-2. EVERY line MUST have {language} words + English words mixed together
-3. NEVER write a full line in only English
-4. NEVER write a full line in only {language}
-5. Keep technical/scientific terms in English: effect, electron, photon, energy, etc.
-6. Keep common words in {language}: है, का, और, लेकिन, तो, में, etc.
-7. End with "धन्यवाद दोस्तों" or similar
-8. DO NOT add any notes/comments after the script
-9. Only output the Speaker1/Speaker2 dialogue lines, nothing else
+### GOLDEN RULES FOR TTS-READY SCRIPTS:
 
-WRONG: "And that was revolutionary at that time." (pure English)
-RIGHT: "और यह उस time बहुत revolutionary था।" (mixed)
+**RULE 1 - SCRIPT HANDLING:**
+- Write Indian language words in NATIVE SCRIPT ONLY ({config['script']})
+- ❌ WRONG: "Namaskaram, aaj hum baat karenge" (Romanized)
+- ✅ RIGHT: "नमस्कारम, आज हम बात करेंगे" (Native Devanagari)
+- Keep common English words (phone, internet, office, bus, bank, loan) in ENGLISH script
+- Example: "आपका loan application process हो गया है।"
 
-WRONG: "और यह बहुत अच्छा है।" (pure Hindi)  
-RIGHT: "और यह really बहुत amazing है।" (mixed)"""
+**RULE 2 - PUNCTUATION IS BREATHING:**
+- Use commas (,) frequently to create natural pauses - every 5-6 words
+- Use full stops (.) clearly to end complete thoughts
+- ❌ Robotic: "Hello I am speaking to you about the bank balance"
+- ✅ Natural: "Hello, I am speaking to you, about the bank balance."
+
+**RULE 3 - CODE-MIXING FORMAT:**
+- Mix {language} ({config['script']}) + English (Latin) naturally
+- Indian words: NATIVE SCRIPT
+- English tech terms: LATIN SCRIPT
+- ❌ WRONG: "Payment fail ayindi" (Telugu in Roman)
+- ✅ RIGHT: "Payment fail అయింది" (Correct mixed script)
+
+**RULE 4 - FORMAT:**
+- Only "Speaker1:" and "Speaker2:" prefixes
+- End with proper conclusion
+- NO notes/comments after the script
+- NO Romanized Indian words"""
     
     def _get_script_user_prompt(self, topic: str, num_turns: int, language: str) -> str:
         """Get user prompt for script generation."""
@@ -359,20 +370,27 @@ Speaker2: बिलकुल सई!""",
 
 {topic}
 
-IMPORTANT INSTRUCTIONS:
-1. Language: {language} mixed with English (use English for all technical/scientific terms)
-2. Format: "Speaker1:" and "Speaker2:" on alternating lines
-3. Keep technical words in English: effect, electron, photon, energy, theory, experiment, etc.
-4. MUST include proper conclusion at the end with "धन्यवाद" or "thank you to our listeners"
-5. Make it educational and engaging
+### TTS-OPTIMIZED SCRIPT REQUIREMENTS:
 
-EXAMPLE OUTPUT:
+1. **Native Script + English Mix:**
+   - Write {language} words in native script ONLY
+   - Keep English tech terms (phone, bank, internet, effect, energy) in English/Latin script
+
+2. **Punctuation for Natural Speech:**
+   - Add commas (,) every 5-6 words for natural pauses
+   - Use full stops (.) to end complete thoughts clearly
+
+3. **Format: "Speaker1:" and "Speaker2:" alternating**
+
+4. **End with proper conclusion** (धन्यवाद दोस्तों / Thank you listeners)
+
+EXAMPLE OUTPUT (Notice punctuation and script mixing):
 {example}
 ...more turns...
-Speaker1: तो आज हमने {topic[:20]}... के बारे में बहुत कुछ सीखा।
-Speaker2: धन्यवाद दोस्तों! अगले episode में मिलते हैं!
+Speaker1: तो आज हमने, {topic[:15]}... के बारे में, बहुत कुछ सीखा।
+Speaker2: धन्यवाद दोस्तों! अगले episode में, मिलते हैं!
 
-START WRITING THE COMPLETE SCRIPT NOW:"""
+START WRITING THE COMPLETE {num_turns}-TURN SCRIPT NOW:"""
 
 
 def download_model(

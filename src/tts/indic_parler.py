@@ -261,11 +261,15 @@ class IndicParlerTTS:
             
         emotion_desc = EMOTION_DESCRIPTIONS.get(config.emotion, config.emotion)
         
-        # Build description following the model's expected format
+        # Build description following Indic Parler-TTS recommended format:
+        # "A [GENDER] [LANGUAGE] speaker delivers a [EMOTION] speech with a [SPEED] pace.
+        #  The recording is of very high quality, with the speaker's voice sounding clear
+        #  and very close up."
+        # This format forces the model to use high-quality weights.
         description = (
-            f"{speaker}'s voice is {emotion_desc} with a {config.pace} pace. "
-            f"The recording is of {config.quality}, with the speaker's voice "
-            f"sounding clear and very close up with {config.background}."
+            f"{speaker}'s voice delivers a {emotion_desc} speech with a {config.pace} pace. "
+            f"The recording is of {config.quality}, with the speaker's voice sounding "
+            f"clear and very close up."
         )
         
         return description
