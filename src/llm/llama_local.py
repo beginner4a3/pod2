@@ -55,7 +55,7 @@ class LLMConfig:
     """Configuration for local LLM"""
     model_path: str = ""
     context_length: int = 4096  # Reduced for faster loading
-    max_tokens: int = 1024      # Reduced for faster generation
+    max_tokens: int = 2048      # Increased for longer scripts with conclusion
     temperature: float = 0.7
     top_p: float = 0.9
     repeat_penalty: float = 1.2  # Prevent repetition (1.0 = disabled)
@@ -240,24 +240,21 @@ class LlamaLocalLLM:
         
         config = lang_config.get(language.lower(), lang_config["hindi"])
         
-        return f"""You are a podcast script writer for {language} language.
+        return f"""You are a podcast script writer. Write in {config['mix']} style (mix of {language} and English).
 
-STRICT OUTPUT FORMAT (no other text):
-Speaker1: {config['greeting']}! [dialogue in {language}]
-Speaker2: [response in {language}]
-Speaker1: [continue]
-Speaker2: [reply]
-...
+OUTPUT FORMAT - Each line must be:
+Speaker1: [dialogue]
+Speaker2: [dialogue]
 
-RULES:
-- ONLY use "Speaker1:" and "Speaker2:" prefixes
-- Write in {language} script ({config['script']})
-- {config['mix']} (mixing English words) is allowed
-- Each line = one speaker turn
-- Natural, conversational style
-- NO JSON, NO brackets, NO titles, NO numbering
-- ONLY Speaker1/Speaker2 dialogue lines
-- Write correctly spelled words for proper TTS pronunciation"""
+CRITICAL RULES:
+1. Use "Speaker1:" and "Speaker2:" prefixes ONLY
+2. ALWAYS keep English words for: technical terms, scientific words, names, numbers
+3. Write common words in {language} script
+4. Example: "Photoelectric effect का concept बहुत interesting है"
+5. DO NOT translate technical terms like: effect, electron, photon, energy, light, wave, etc.
+6. MUST end with a conclusion saying goodbye/धन्यवाद/thank you
+7. Natural conversational style
+8. NO JSON, NO brackets, NO numbering"""
     
     def _get_script_user_prompt(self, topic: str, num_turns: int, language: str) -> str:
         """Get user prompt for script generation."""
@@ -351,21 +348,24 @@ Speaker2: बिलकुल सई!""",
         
         example = examples.get(language.lower(), examples["hindi"])
         
-        return f"""Write a podcast script about:
+        return f"""Write a {num_turns}-turn podcast script about:
 
 {topic}
 
-REQUIREMENTS:
-- Language: {language}
-- Turns: {num_turns} (alternating Speaker1 and Speaker2)
-- Start with greeting
-- End with conclusion
-- Use correct spelling for proper TTS pronunciation
+IMPORTANT INSTRUCTIONS:
+1. Language: {language} mixed with English (use English for all technical/scientific terms)
+2. Format: "Speaker1:" and "Speaker2:" on alternating lines
+3. Keep technical words in English: effect, electron, photon, energy, theory, experiment, etc.
+4. MUST include proper conclusion at the end with "धन्यवाद" or "thank you to our listeners"
+5. Make it educational and engaging
 
-EXAMPLE FORMAT:
+EXAMPLE OUTPUT:
 {example}
+...more turns...
+Speaker1: तो आज हमने {topic[:20]}... के बारे में बहुत कुछ सीखा।
+Speaker2: धन्यवाद दोस्तों! अगले episode में मिलते हैं!
 
-NOW WRITE THE FULL {num_turns}-TURN SCRIPT:"""
+START WRITING THE COMPLETE SCRIPT NOW:"""
 
 
 def download_model(
