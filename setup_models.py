@@ -22,11 +22,17 @@ LLM_OPTIONS = {
         "size": "~2GB",
         "desc": "BharatGPT-3B (BEST for Hindi/Telugu/Indian languages)"
     },
+    "llama3": {
+        "repo": "bartowski/Meta-Llama-3-8B-Instruct-GGUF",
+        "file": "Meta-Llama-3-8B-Instruct-Q4_K_M.gguf",
+        "size": "~5GB",
+        "desc": "Llama-3-8B (Most powerful, good multilingual)"
+    },
     "mistral": {
         "repo": "TheBloke/Mistral-7B-Instruct-v0.2-GGUF",
         "file": "mistral-7b-instruct-v0.2.Q4_K_M.gguf",
         "size": "~4GB",
-        "desc": "Mistral-7B (Better for English)"
+        "desc": "Mistral-7B (Good for English)"
     }
 }
 
