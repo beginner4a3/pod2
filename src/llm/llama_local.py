@@ -249,39 +249,44 @@ Speaker2: [dialogue]
 ### GOLDEN RULES FOR TTS-READY SCRIPTS:
 
 **RULE 1 - SCRIPT HANDLING:**
-- Write Indian language words in NATIVE SCRIPT ONLY ({config['script']})
-- ❌ WRONG: "Namaskaram, aaj hum baat karenge" (Romanized)
-- ✅ RIGHT: "नमस्कारम, आज हम बात करेंगे" (Native Devanagari)
-- Keep common English words (phone, internet, office, bus, bank, loan) in ENGLISH script
-- Example: "आपका loan application process हो गया है।"
+- Write {language} words in NATIVE SCRIPT ONLY ({config['script']})
+- Keep English technical terms (photon, electron, energy, packet, wave, particle) in ENGLISH script
+- ❌ "Namaskaram, aaj hum baat karenge" (Romanized Hindi - WRONG)
+- ✅ "नमस्कारम, आज हम बात करेंगे" (Native Devanagari - CORRECT)
 
-**RULE 2 - PUNCTUATION IS BREATHING:**
-- Use commas (,) frequently to create natural pauses - every 5-6 words
-- Use full stops (.) clearly to end complete thoughts
-- ❌ Robotic: "Hello I am speaking to you about the bank balance"
-- ✅ Natural: "Hello, I am speaking to you, about the bank balance."
+**RULE 2 - PUNCTUATION FOR NATURAL SPEECH:**
+- Use commas (,) every 5-6 words for natural pauses
+- ❌ "Hello I am speaking to you about the bank balance"
+- ✅ "Hello, I am speaking to you, about the bank balance."
 
-**RULE 3 - CODE-MIXING FORMAT:**
-- Mix {language} ({config['script']}) + English (Latin) naturally
-- Indian words: NATIVE SCRIPT
-- English tech terms: LATIN SCRIPT
-- ❌ WRONG: "Payment fail ayindi" (Telugu in Roman)
-- ✅ RIGHT: "Payment fail అయింది" (Correct mixed script)
+**RULE 3 - CODE-MIXING (ONLY {language} + ENGLISH):**
+- Mix {language} ({config['script']}) + English (Latin) ONLY
+- ❌ "energy packets" as "पाकिस्तान" (WRONG - this is a country name!)
+- ✅ "energy packets" as "energy packets" (keep in English)
+- ❌ Random French/Spanish/Chinese words (nous, que, 明显)
+- ✅ Use ONLY {language} + English, nothing else
 
-**RULE 4 - FORMAT:**
+**RULE 4 - FACTUAL ACCURACY:**
+- Write scientifically correct content
+- Do NOT hallucinate or make up facts
+- If unsure about a fact, skip it
+- Use correct vocabulary: "माध्यम" (medium), NOT "मंच" (stage)
+
+**RULE 5 - FORMAT:**
 - Only "Speaker1:" and "Speaker2:" prefixes
-- End with proper conclusion
+- End with "धन्यवाद दोस्तों" or similar
 - NO notes/comments after the script
-- NO Romanized Indian words"""
+- NO Romanized Indian words
+- NO other languages (French, Spanish, Chinese, etc.)"""
     
     def _get_script_user_prompt(self, topic: str, num_turns: int, language: str) -> str:
         """Get user prompt for script generation."""
         # Examples for all languages
         examples = {
-            "hindi": """Speaker1: नमस्ते दोस्तों! आज हम एक interesting topic पर बात करेंगे।
-Speaker2: हाँ, यह topic बहुत important है। चलिए शुरू करते हैं।
-Speaker1: तो पहली बात यह है कि...
-Speaker2: बिल्कुल सही! और इसके साथ...""",
+            "hindi": """Speaker1: नमस्ते दोस्तों! आज हम Physics के एक, interesting topic पर बात करेंगे।
+Speaker2: हाँ, यह topic काफी important है। चलिए, शुरू करते हैं।
+Speaker1: सबसे पहले, यह समझते हैं कि, light की nature कैसी है।
+Speaker2: बिल्कुल! Light की dual nature होती है, यानी wave और particle दोनों।""",
 
             "telugu": """Speaker1: నమస్కారం! ఈ రోజు మనం ఒక important topic గురించి మాట్లాడుదాం.
 Speaker2: అవును, ఇది చాలా interesting. మొదలు పెడదాం.
