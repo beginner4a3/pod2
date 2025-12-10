@@ -110,20 +110,40 @@ def generate_script_from_content(
     language: str,
     style: str,
     num_turns: int,
+    gemini_api_key: str = "",
     progress=gr.Progress()
 ) -> Tuple[str, str]:
-    """Generate podcast script from content using pre-installed LLM."""
+    """Generate podcast script from content using Gemini API or local LLM."""
     if not content.strip():
         return "", "⚠️ No content provided"
     
     try:
-        progress(0.1, desc="Loading LLM...")
+        # Try Gemini API first (best quality)
+        from src.llm.gemini_api import GeminiScriptGenerator
+        import os
+        
+        # Use provided API key or environment variable
+        api_key = gemini_api_key.strip() if gemini_api_key else os.environ.get("GEMINI_API_KEY", "")
+        
+        if api_key:
+            progress(0.2, desc="Using Gemini API (best quality)...")
+            generator = GeminiScriptGenerator(api_key=api_key)
+            script = generator.generate_script(
+                topic=content[:4000],
+                language=language,
+                num_turns=num_turns
+            )
+            progress(1.0, desc="Done!")
+            return script, f"✅ Generated {len(script.splitlines())} turns using Gemini API"
+        
+        # Fallback to local LLM
+        progress(0.1, desc="Loading local LLM...")
         from src.llm.llama_local import LlamaLocalLLM
         
         llm = LlamaLocalLLM()
         llm.load()  # Auto-detects pre-installed model
         
-        progress(0.5, desc="Generating script...")
+        progress(0.5, desc="Generating script (local LLM)...")
         result = llm.generate_podcast_script(
             topic=content[:4000],  # Limit content size
             language=language,
@@ -455,6 +475,14 @@ def create_interface():
                                 label="Turns"
                             )
                         
+                        # Gemini API key for best quality
+                        gemini_key = gr.Textbox(
+                            label="🔑 Gemini API Key (recommended for best quality)",
+                            placeholder="Paste your Gemini API key here (get free: https://aistudio.google.com/app/apikey)",
+                            type="password",
+                            info="Without API key, uses local LLM (may produce lower quality)"
+                        )
+                        
                         generate_script_btn = gr.Button("🤖 Generate Script", variant="secondary")
                         
                         # --- Editable Script ---
@@ -631,7 +659,7 @@ Speaker2: Medical field में इसका बहुत फायदा ह�
                     fn=generate_script_from_content,
                     inputs=[
                         content_text, script_language, script_style, 
-                        num_turns
+                        num_turns, gemini_key
                     ],
                     outputs=[podcast_script, script_status]
                 )

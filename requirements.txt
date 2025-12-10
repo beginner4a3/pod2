@@ -22,9 +22,11 @@ transformers>=4.40.0
 huggingface_hub>=0.20.0
 
 # -----------------------------------------------------------------------------
-# LLM - Local Script Generation (Llama/Mistral)
-# Pre-built CUDA wheels available from: https://abetlen.github.io/llama-cpp-python/whl/cu121
+# LLM - Script Generation
+# Option 1: Gemini API (best quality, requires API key)
+# Option 2: Local LLM (Llama/Mistral, no API key needed but lower quality)
 # -----------------------------------------------------------------------------
+google-generativeai>=0.3.0
 --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu121
 llama-cpp-python>=0.2.0
 
