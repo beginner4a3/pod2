@@ -58,6 +58,7 @@ class LLMConfig:
     max_tokens: int = 1024      # Reduced for faster generation
     temperature: float = 0.7
     top_p: float = 0.9
+    repeat_penalty: float = 1.2  # Prevent repetition (1.0 = disabled)
     n_gpu_layers: int = -1      # -1 = all layers on GPU
 
 
@@ -152,6 +153,7 @@ class LlamaLocalLLM:
             max_tokens=max_tokens or self.config.max_tokens,
             temperature=temperature or self.config.temperature,
             top_p=self.config.top_p,
+            repeat_penalty=self.config.repeat_penalty,
             stream=stream
         )
         

@@ -136,16 +136,23 @@ def generate_script_from_content(
             import re
             lines = raw.split('\n')
             turn_num = 0
+            seen_texts = set()  # For deduplication
+            
             for line in lines:
                 line = line.strip()
                 if not line:
                     continue
                     
-                # Check for various speaker patterns
-                match = re.match(r'^(Speaker\d+|Surya|Chandni|Host|Guest|[A-Za-z]+)\s*[:：]\s*(.+)', line)
+                # Check for various speaker patterns (Speaker1, Speech 1, Host, etc.)
+                match = re.match(r'^(Speaker\s*\d+|Speech\s*\d+|Surya|Chandni|Host|Guest|[A-Za-z]+)\s*[:：]\s*(.+)', line, re.IGNORECASE)
                 if match:
-                    speaker_name = match.group(1)
                     text = match.group(2).strip()
+                    
+                    # Skip duplicate lines (repetition from LLM)
+                    if text in seen_texts:
+                        continue
+                    seen_texts.add(text)
+                    
                     # Normalize to Speaker1/Speaker2
                     if turn_num % 2 == 0:
                         speaker = "Speaker1"
