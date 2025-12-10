@@ -493,7 +493,7 @@ Speaker2: Medical field में इसका बहुत फायदा ह�
                             
                             gr.Markdown("**Post-Processing**")
                             with gr.Row():
-                                add_noise = gr.Checkbox(label="Add background noise", value=True)
+                                add_noise = gr.Checkbox(label="Add background noise", value=False)
                                 noise_level = gr.Slider(
                                     minimum=0.001, maximum=0.01, value=0.002, step=0.001,
                                     label="Noise level"
@@ -532,7 +532,14 @@ Speaker2: Medical field में इसका बहुत फायदा ह�
                     outputs=[speaker1_name, speaker2_name]
                 )
                 
-                # Extract text from file
+                # Extract text from file (automatic on upload)
+                file_upload.change(
+                    fn=extract_document_text,
+                    inputs=[file_upload],
+                    outputs=[content_text, extract_status]
+                )
+                
+                # Also keep extract button for manual use
                 extract_btn.click(
                     fn=extract_document_text,
                     inputs=[file_upload],

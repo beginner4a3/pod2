@@ -6,12 +6,32 @@ Run this after pip install -r requirements.txt:
 
 Downloads:
 1. Indic-ParlerTTS model (~3GB)
-2. Mistral-7B LLM model (~4GB)
+2. BharatGPT-3B-Indic LLM (~2GB) - Optimized for Indian languages!
 """
 
 import os
 import sys
 from pathlib import Path
+
+
+# LLM Options (choose one)
+LLM_OPTIONS = {
+    "bharatgpt": {
+        "repo": "QuantFactory/BharatGPT-3B-Indic-GGUF",
+        "file": "BharatGPT-3B-Indic.Q4_K_M.gguf",
+        "size": "~2GB",
+        "desc": "BharatGPT-3B (BEST for Hindi/Telugu/Indian languages)"
+    },
+    "mistral": {
+        "repo": "TheBloke/Mistral-7B-Instruct-v0.2-GGUF",
+        "file": "mistral-7b-instruct-v0.2.Q4_K_M.gguf",
+        "size": "~4GB",
+        "desc": "Mistral-7B (Better for English)"
+    }
+}
+
+# Default: BharatGPT for Indian languages
+DEFAULT_LLM = "bharatgpt"
 
 
 def main():
@@ -58,27 +78,53 @@ def main():
         print("⏭️ Skipped (no token)")
     
     # =========================================================================
-    # 2. Download LLM Model (Mistral-7B)
+    # 2. Download LLM Model
     # =========================================================================
     print("\n" + "=" * 60)
-    print("📥 [2/2] Downloading Mistral-7B LLM (~4GB)...")
+    print("📥 [2/2] Downloading LLM Model...")
     print("=" * 60)
     
-    llm_filename = "mistral-7b-instruct-v0.2.Q4_K_M.gguf"
+    # Choose LLM
+    llm_choice = DEFAULT_LLM
+    print("\nAvailable LLM options:")
+    for key, opt in LLM_OPTIONS.items():
+        marker = "→" if key == DEFAULT_LLM else " "
+        print(f"  {marker} {key}: {opt['desc']} ({opt['size']})")
+    
+    user_choice = input(f"\nChoose LLM [{DEFAULT_LLM}]: ").strip().lower()
+    if user_choice in LLM_OPTIONS:
+        llm_choice = user_choice
+    
+    llm_config = LLM_OPTIONS[llm_choice]
+    llm_filename = llm_config["file"]
     llm_path = models_dir / llm_filename
+    
+    print(f"\nDownloading: {llm_config['desc']}")
     
     if llm_path.exists():
         print(f"✅ LLM Model already exists: {llm_path}")
     else:
         try:
             downloaded_path = hf_hub_download(
-                repo_id="TheBloke/Mistral-7B-Instruct-v0.2-GGUF",
+                repo_id=llm_config["repo"],
                 filename=llm_filename,
                 local_dir=models_dir
             )
             print(f"✅ LLM Model: {downloaded_path}")
         except Exception as e:
             print(f"❌ LLM download failed: {e}")
+            # Try alternate filename for BharatGPT
+            if llm_choice == "bharatgpt":
+                print("Trying alternate quantization...")
+                try:
+                    downloaded_path = hf_hub_download(
+                        repo_id=llm_config["repo"],
+                        filename="BharatGPT-3B-Indic.Q5_K_M.gguf",
+                        local_dir=models_dir
+                    )
+                    print(f"✅ LLM Model: {downloaded_path}")
+                except Exception as e2:
+                    print(f"❌ Alternate also failed: {e2}")
     
     # =========================================================================
     # Done

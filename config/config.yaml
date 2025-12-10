@@ -48,16 +48,16 @@ tts:
 # LLM Configuration
 # =============================================================================
 llm:
-  # Primary: Self-hosted Llama/Mistral (no API key needed)
+  # Primary: Self-hosted BharatGPT (no API key needed, optimized for Indian languages)
   provider: "llama-local"
   
   # Local model settings
   local:
-    model_path: ""  # Path to GGUF model file (download separately)
-    model_repo: "TheBloke/Mistral-7B-Instruct-v0.2-GGUF"
-    model_file: "mistral-7b-instruct-v0.2.Q4_K_M.gguf"
-    context_length: 8192
-    max_tokens: 4096
+    model_path: ""  # Path to GGUF model file (auto-detected)
+    model_repo: "QuantFactory/BharatGPT-3B-Indic-GGUF"
+    model_file: "BharatGPT-3B-Indic.Q4_K_M.gguf"
+    context_length: 4096
+    max_tokens: 1024
     temperature: 0.7
   
   # Alternative API providers (optional - requires API keys)

@@ -27,7 +27,7 @@ python src/main.py --ui
 
 - 🎙️ **21 Indian Languages**: Hindi, Telugu, Tamil, Malayalam, Kannada, Bengali, etc.
 - 🗣️ **69 Voices**: Male/Female speakers with 12 emotions
-- 🤖 **LLM Script Generation**: Self-hosted Mistral-7B (auto-downloads)
+- 🤖 **LLM Script Generation**: BharatGPT-3B-Indic (optimized for Indian languages)
 - 📄 **Document Upload**: PDF, DOCX, TXT
 - 🎤 **Voice Cloning**: XTTS v2 (upload ~6 sec reference audio)
 - 🎛️ **Advanced Settings**: Pace, pitch, expressivity, noise, crossfade
@@ -78,4 +78,4 @@ requirements.txt        # All dependencies
 
 - **TTS**: [AI4Bharat Indic-ParlerTTS](https://huggingface.co/ai4bharat/indic-parler-tts)
 - **Voice Cloning**: [Coqui XTTS v2](https://huggingface.co/coqui/XTTS-v2)
-- **LLM**: [Mistral-7B](https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF)
+- **LLM**: [BharatGPT-3B-Indic](https://huggingface.co/QuantFactory/BharatGPT-3B-Indic-GGUF)
