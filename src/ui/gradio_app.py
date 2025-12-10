@@ -160,12 +160,17 @@ def generate_script_from_content(
             title = "Script"
         
         if not script_lines:
-            # Fallback: Create sample script
-            script_lines = [
-                f"Speaker1: नमस्ते! आज हम {content[:50]}... के बारे में बात करेंगे।",
-                "Speaker2: हाँ, यह बहुत interesting topic है।",
-            ]
-            title = "Sample Script"
+            # Fallback: Show raw response if parsing failed
+            if "raw_response" in result:
+                # Return raw LLM output for user to manually edit
+                return result["raw_response"], "⚠️ Raw output (please format as Speaker1:/Speaker2:)"
+            elif "turns" in result:
+                # JSON was parsed but no valid turns found
+                import json
+                return json.dumps(result, ensure_ascii=False, indent=2), "⚠️ JSON output (please format manually)"
+            else:
+                # No output at all
+                return "", "❌ No script generated. Try again."
         
         progress(1.0, desc="Done!")
         script = "\n".join(script_lines)

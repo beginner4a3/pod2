@@ -203,41 +203,44 @@ class LlamaLocalLLM:
     
     def _get_script_system_prompt(self, language: str, style: str) -> str:
         """Get system prompt for script generation."""
-        return f"""You are an expert podcast script writer for Indian language podcasts.
-You write engaging, natural conversations in {language}.
-Your scripts are {style} in tone and perfect for text-to-speech synthesis.
+        return f"""You are an expert podcast script writer. You write {style} scripts in {language}.
+
+IMPORTANT: Output ONLY the script in this EXACT format (no JSON, no extra text):
+
+Speaker1: [first speaker's dialogue]
+Speaker2: [second speaker's response]
+Speaker1: [continue the conversation]
+Speaker2: [reply]
+...
 
 Rules:
-1. Write the script in {language} language
-2. Output in JSON format with "title", "speakers", and "turns" fields
-3. Each turn has "speaker", "text", and "emotion" fields
-4. Emotions can be: happy, neutral, conversation, surprise, etc.
-5. Make the conversation natural and engaging
-6. Use proper punctuation for natural pauses"""
+- Use ONLY "Speaker1:" and "Speaker2:" as prefixes
+- Write dialogue in {language} language
+- Each line is one speaker turn
+- Keep dialogue natural and conversational
+- No JSON brackets or formatting
+- No titles or headers
+- Just Speaker1/Speaker2 lines"""
     
     def _get_script_user_prompt(self, topic: str, num_turns: int, language: str) -> str:
         """Get user prompt for script generation."""
-        return f"""Write a podcast script about the following topic:
+        return f"""Write a podcast script about:
 
 {topic}
 
 Requirements:
 - Language: {language}
-- Number of turns: approximately {num_turns}
-- Include proper introductions
-- Make it informative yet entertaining
-- End with a conclusion
+- Total turns: {num_turns} (alternating Speaker1 and Speaker2)
+- Start with introductions
+- End with conclusion
 
-Output the script in this JSON format:
-{{
-  "title": "Podcast Title",
-  "speakers": ["Speaker1", "Speaker2"],
-  "turns": [
-    {{"speaker": "Speaker1", "text": "...", "emotion": "neutral"}},
-    {{"speaker": "Speaker2", "text": "...", "emotion": "happy"}},
-    ...
-  ]
-}}"""
+Output format (EXACTLY like this):
+Speaker1: नमस्ते! आज हम... के बारे में बात करेंगे।
+Speaker2: हाँ, यह बहुत interesting topic है।
+Speaker1: ...
+Speaker2: ...
+
+Write the script now:"""
 
 
 def download_model(
