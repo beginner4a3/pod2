@@ -49,22 +49,45 @@ def get_xtts():
 
 
 def get_speakers_for_language(language: str) -> list:
-    """Get speaker names for a language."""
+    """Get speaker names for a language with style info."""
     speakers = SPEAKERS.get(language.lower(), [])
-    return [s.name for s in speakers]
+    # Format: "Name (Gender) - Style" or just "Name (Gender)"
+    result = []
+    for s in speakers:
+        if s.style:
+            result.append(f"{s.name} ({s.gender}) - {s.style}")
+        else:
+            result.append(f"{s.name} ({s.gender})")
+    return result
+
+
+def get_speaker_name_from_label(label: str) -> str:
+    """Extract speaker name from dropdown label like 'Rohit (male) - Clear'."""
+    if "(" in label:
+        return label.split("(")[0].strip()
+    return label
 
 
 def update_speakers(language: str) -> Tuple[gr.Dropdown, gr.Dropdown]:
     """Update speaker dropdowns when language changes."""
-    speakers = get_speakers_for_language(language)
-    recommended = [s.name for s in SPEAKERS.get(language.lower(), []) if s.recommended]
+    speaker_labels = get_speakers_for_language(language)
+    speaker_objs = SPEAKERS.get(language.lower(), [])
     
-    default1 = recommended[0] if len(recommended) > 0 else (speakers[0] if speakers else "Rohit")
-    default2 = recommended[1] if len(recommended) > 1 else (speakers[1] if len(speakers) > 1 else "Divya")
+    # Find recommended speakers with full labels
+    recommended_labels = []
+    for s in speaker_objs:
+        if s.recommended:
+            if s.style:
+                recommended_labels.append(f"{s.name} ({s.gender}) - {s.style}")
+            else:
+                recommended_labels.append(f"{s.name} ({s.gender})")
+    
+    default1 = recommended_labels[0] if len(recommended_labels) > 0 else (speaker_labels[0] if speaker_labels else "Rohit (male)")
+    default2 = recommended_labels[1] if len(recommended_labels) > 1 else (speaker_labels[1] if len(speaker_labels) > 1 else "Divya (female)")
     
     return (
-        gr.Dropdown(choices=speakers, value=default1),
-        gr.Dropdown(choices=speakers, value=default2)
+        gr.Dropdown(choices=speaker_labels, value=default1),
+        gr.Dropdown(choices=speaker_labels, value=default2)
     )
 
 
@@ -192,13 +215,19 @@ def generate_podcast(
     language: str,
     speaker1_name: str,
     speaker1_emotion: str,
+    speaker1_pace: str,
+    speaker1_pitch: str,
+    speaker1_expressivity: str,
     speaker1_ref: Optional[str],
     speaker2_name: str,
     speaker2_emotion: str,
+    speaker2_pace: str,
+    speaker2_pitch: str,
+    speaker2_expressivity: str,
     speaker2_ref: Optional[str],
-    pace: str,
-    pitch: str,
-    expressivity: str,
+    tts_temperature: float,
+    tts_top_p: float,
+    tts_repetition_penalty: float,
     gap_ms: int,
     crossfade: bool,
     intro_silence_ms: int,
@@ -210,6 +239,10 @@ def generate_podcast(
     """Generate podcast from script with all settings."""
     if not script.strip():
         return None, "⚠️ Please enter a script"
+    
+    # Extract speaker names from labels like "Rohit (male) - Clear, energetic"
+    speaker1_name = get_speaker_name_from_label(speaker1_name)
+    speaker2_name = get_speaker_name_from_label(speaker2_name)
     
     try:
         from src.audio.mixer import PodcastMixer, AudioClip, add_silence, normalize_volume
@@ -252,25 +285,40 @@ def generate_podcast(
         use_clone_s1 = speaker1_ref is not None and xtts is not None
         use_clone_s2 = speaker2_ref is not None and xtts is not None
         
+        # Create per-speaker TTS configs with advanced parameters
+        config1 = TTSConfig(
+            pace=speaker1_pace,
+            pitch=speaker1_pitch,
+            expressivity=speaker1_expressivity,
+            emotion=speaker1_emotion,
+            temperature=tts_temperature,
+            top_p=tts_top_p,
+            repetition_penalty=tts_repetition_penalty
+        )
+        config2 = TTSConfig(
+            pace=speaker2_pace,
+            pitch=speaker2_pitch,
+            expressivity=speaker2_expressivity,
+            emotion=speaker2_emotion,
+            temperature=tts_temperature,
+            top_p=tts_top_p,
+            repetition_penalty=tts_repetition_penalty
+        )
+        
         # Generate audio for each turn
         audio_clips = []
-        config = TTSConfig(
-            pace=pace,
-            pitch=pitch,
-            expressivity=expressivity
-        )
         
         for i, (speaker_num, text) in enumerate(turns):
             progress(0.2 + (0.6 * i / len(turns)), desc=f"Generating turn {i+1}/{len(turns)}...")
             
             if speaker_num == 1:
                 speaker_name = speaker1_name
-                emotion = speaker1_emotion
+                config = config1
                 use_clone = use_clone_s1
                 ref_audio = speaker1_ref
             else:
                 speaker_name = speaker2_name
-                emotion = speaker2_emotion
+                config = config2
                 use_clone = use_clone_s2
                 ref_audio = speaker2_ref
             
@@ -279,7 +327,6 @@ def generate_podcast(
                 audio = xtts.generate(text, ref_audio, language)
             else:
                 # Use Indic-ParlerTTS
-                config.emotion = emotion
                 audio = tts.generate(text, speaker=speaker_name, config=config)
             
             audio_clips.append(AudioClip(
@@ -429,13 +476,26 @@ Speaker2: Medical field में इसका बहुत फायदा ह�
                                 gr.Markdown("**Speaker 1**")
                                 speaker1_name = gr.Dropdown(
                                     choices=default_speakers,
-                                    value="Rohit",
-                                    label="Name"
+                                    value=default_speakers[0] if default_speakers else "Rohit (male)",
+                                    label="Voice"
                                 )
                                 speaker1_emotion = gr.Dropdown(
                                     choices=EMOTIONS,
                                     value="conversation",
                                     label="Emotion"
+                                )
+                                with gr.Row():
+                                    speaker1_pace = gr.Dropdown(
+                                        choices=["slow", "moderate", "fast"],
+                                        value="moderate", label="Pace"
+                                    )
+                                    speaker1_pitch = gr.Dropdown(
+                                        choices=["low", "moderate", "high"],
+                                        value="moderate", label="Pitch"
+                                    )
+                                speaker1_expressivity = gr.Dropdown(
+                                    choices=["monotone", "slightly expressive", "very expressive"],
+                                    value="slightly expressive", label="Expressivity"
                                 )
                                 if voice_cloning_available:
                                     speaker1_ref = gr.Audio(
@@ -449,13 +509,26 @@ Speaker2: Medical field में इसका बहुत फायदा ह�
                                 gr.Markdown("**Speaker 2**")
                                 speaker2_name = gr.Dropdown(
                                     choices=default_speakers,
-                                    value="Divya",
-                                    label="Name"
+                                    value=default_speakers[1] if len(default_speakers) > 1 else "Divya (female)",
+                                    label="Voice"
                                 )
                                 speaker2_emotion = gr.Dropdown(
                                     choices=EMOTIONS,
                                     value="conversation",
                                     label="Emotion"
+                                )
+                                with gr.Row():
+                                    speaker2_pace = gr.Dropdown(
+                                        choices=["slow", "moderate", "fast"],
+                                        value="moderate", label="Pace"
+                                    )
+                                    speaker2_pitch = gr.Dropdown(
+                                        choices=["low", "moderate", "high"],
+                                        value="moderate", label="Pitch"
+                                    )
+                                speaker2_expressivity = gr.Dropdown(
+                                    choices=["monotone", "slightly expressive", "very expressive"],
+                                    value="slightly expressive", label="Expressivity"
                                 )
                                 if voice_cloning_available:
                                     speaker2_ref = gr.Audio(
@@ -468,22 +541,22 @@ Speaker2: Medical field में इसका बहुत फायदा ह�
                         # --- Advanced Settings ---
                         with gr.Accordion("🎛️ Advanced Audio Settings", open=False):
                             
-                            gr.Markdown("**TTS Settings**")
+                            gr.Markdown("**TTS Generation** (affects prosody & expressiveness)")
                             with gr.Row():
-                                tts_pace = gr.Dropdown(
-                                    choices=["slow", "moderate", "fast"],
-                                    value="moderate",
-                                    label="Pace"
+                                tts_temperature = gr.Slider(
+                                    minimum=0.3, maximum=1.2, value=0.7, step=0.1,
+                                    label="Temperature",
+                                    info="0.6-0.9 conversational, 0.9-1.2 dramatic"
                                 )
-                                tts_pitch = gr.Dropdown(
-                                    choices=["low", "moderate", "high"],
-                                    value="moderate",
-                                    label="Pitch"
+                                tts_top_p = gr.Slider(
+                                    minimum=0.2, maximum=1.0, value=0.9, step=0.1,
+                                    label="Top-p",
+                                    info="0.6-0.8 natural, 0.8-1.0 expressive"
                                 )
-                                tts_expressivity = gr.Dropdown(
-                                    choices=["monotone", "slightly expressive", "very expressive"],
-                                    value="slightly expressive",
-                                    label="Expressivity"
+                                tts_repetition_penalty = gr.Slider(
+                                    minimum=1.0, maximum=2.0, value=1.1, step=0.1,
+                                    label="Repetition Penalty",
+                                    info="≥1.1 for stable generation"
                                 )
                             
                             gr.Markdown("**Mixing Settings**")
@@ -568,9 +641,13 @@ Speaker2: Medical field में इसका बहुत फायदा ह�
                     fn=generate_podcast,
                     inputs=[
                         podcast_script, script_language,
-                        speaker1_name, speaker1_emotion, speaker1_ref,
-                        speaker2_name, speaker2_emotion, speaker2_ref,
-                        tts_pace, tts_pitch, tts_expressivity,
+                        speaker1_name, speaker1_emotion, 
+                        speaker1_pace, speaker1_pitch, speaker1_expressivity,
+                        speaker1_ref,
+                        speaker2_name, speaker2_emotion,
+                        speaker2_pace, speaker2_pitch, speaker2_expressivity,
+                        speaker2_ref,
+                        tts_temperature, tts_top_p, tts_repetition_penalty,
                         gap_ms, crossfade, intro_silence,
                         add_noise, noise_level, normalize
                     ],

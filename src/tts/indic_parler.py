@@ -23,6 +23,7 @@ class Speaker:
     language: str
     gender: str  # "male" or "female"
     recommended: bool = False
+    style: str = ""  # Voice style description
 
 
 @dataclass 
@@ -34,15 +35,20 @@ class TTSConfig:
     expressivity: str = "slightly expressive"
     quality: str = "very high quality"
     background: str = "no background noise"
+    # Advanced generation parameters
+    temperature: float = 0.7  # 0.6-0.9 conversational, 0.9-1.2 dramatic
+    top_p: float = 0.9  # 0.6-0.8 natural, 0.8-1.0 expressive
+    repetition_penalty: float = 1.1  # >=1.1 for stable generation
+    max_new_tokens: int = 2048  # Max audio tokens
 
 
-# All 69 speakers organized by language
+# All 69 speakers organized by language with voice characteristics
 SPEAKERS = {
     "hindi": [
-        Speaker("Rohit", "hindi", "male", recommended=True),
-        Speaker("Divya", "hindi", "female", recommended=True),
-        Speaker("Aman", "hindi", "male"),
-        Speaker("Rani", "hindi", "female"),
+        Speaker("Rohit", "hindi", "male", recommended=True, style="Clear, energetic, bright"),
+        Speaker("Divya", "hindi", "female", recommended=True, style="Warm, expressive, medium pitch"),
+        Speaker("Aman", "hindi", "male", style="Deep, calm, authoritative"),
+        Speaker("Rani", "hindi", "female", style="Soft, gentle, soothing"),
     ],
     "telugu": [
         Speaker("Prakash", "telugu", "male", recommended=True),
@@ -303,13 +309,19 @@ class IndicParlerTTS:
             text, return_tensors="pt"
         ).to(self.device)
         
-        # Generate
+        # Generate with advanced parameters
         with torch.no_grad():
             generation = self.model.generate(
                 input_ids=description_input_ids.input_ids,
                 attention_mask=description_input_ids.attention_mask,
                 prompt_input_ids=prompt_input_ids.input_ids,
-                prompt_attention_mask=prompt_input_ids.attention_mask
+                prompt_attention_mask=prompt_input_ids.attention_mask,
+                # Advanced generation parameters
+                do_sample=True,
+                temperature=config.temperature,
+                top_p=config.top_p,
+                repetition_penalty=config.repetition_penalty,
+                max_new_tokens=config.max_new_tokens
             )
             
         audio = generation.cpu().numpy().squeeze()

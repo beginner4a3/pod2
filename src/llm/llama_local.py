@@ -240,21 +240,28 @@ class LlamaLocalLLM:
         
         config = lang_config.get(language.lower(), lang_config["hindi"])
         
-        return f"""You are a podcast script writer. Write in {config['mix']} style (mix of {language} and English).
+        return f"""You are a podcast script writer. Write in {config['mix']} style.
 
-OUTPUT FORMAT - Each line must be:
+OUTPUT FORMAT:
 Speaker1: [dialogue]
 Speaker2: [dialogue]
 
-CRITICAL RULES:
+STRICT RULES:
 1. Use "Speaker1:" and "Speaker2:" prefixes ONLY
-2. ALWAYS keep English words for: technical terms, scientific words, names, numbers
-3. Write common words in {language} script
-4. Example: "Photoelectric effect का concept बहुत interesting है"
-5. DO NOT translate technical terms like: effect, electron, photon, energy, light, wave, etc.
-6. MUST end with a conclusion saying goodbye/धन्यवाद/thank you
-7. Natural conversational style
-8. NO JSON, NO brackets, NO numbering"""
+2. EVERY line MUST have {language} words + English words mixed together
+3. NEVER write a full line in only English
+4. NEVER write a full line in only {language}
+5. Keep technical/scientific terms in English: effect, electron, photon, energy, etc.
+6. Keep common words in {language}: है, का, और, लेकिन, तो, में, etc.
+7. End with "धन्यवाद दोस्तों" or similar
+8. DO NOT add any notes/comments after the script
+9. Only output the Speaker1/Speaker2 dialogue lines, nothing else
+
+WRONG: "And that was revolutionary at that time." (pure English)
+RIGHT: "और यह उस time बहुत revolutionary था।" (mixed)
+
+WRONG: "और यह बहुत अच्छा है।" (pure Hindi)  
+RIGHT: "और यह really बहुत amazing है।" (mixed)"""
     
     def _get_script_user_prompt(self, topic: str, num_turns: int, language: str) -> str:
         """Get user prompt for script generation."""

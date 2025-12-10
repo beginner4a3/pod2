@@ -20,19 +20,25 @@ LLM_OPTIONS = {
         "repo": "QuantFactory/BharatGPT-3B-Indic-GGUF",
         "file": "BharatGPT-3B-Indic.Q4_K_M.gguf",
         "size": "~2GB",
-        "desc": "BharatGPT-3B (BEST for Hindi/Telugu/Indian languages)"
+        "desc": "BharatGPT-3B (Best for Indian languages, Apache 2.0)"
+    },
+    "nemo": {
+        "repo": "bartowski/Mistral-Nemo-Instruct-2407-GGUF",
+        "file": "Mistral-Nemo-Instruct-2407-Q4_K_M.gguf",
+        "size": "~7GB",
+        "desc": "Mistral-NeMo-12B (BEST quality, Apache 2.0, commercial OK)"
     },
     "llama3": {
         "repo": "bartowski/Meta-Llama-3-8B-Instruct-GGUF",
         "file": "Meta-Llama-3-8B-Instruct-Q4_K_M.gguf",
         "size": "~5GB",
-        "desc": "Llama-3-8B (Most powerful, good multilingual)"
+        "desc": "Llama-3-8B (Powerful, but NOT for commercial use)"
     },
     "mistral": {
         "repo": "TheBloke/Mistral-7B-Instruct-v0.2-GGUF",
         "file": "mistral-7b-instruct-v0.2.Q4_K_M.gguf",
         "size": "~4GB",
-        "desc": "Mistral-7B (Good for English)"
+        "desc": "Mistral-7B (Good for English, Apache 2.0)"
     }
 }
 
